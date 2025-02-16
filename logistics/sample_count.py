@@ -1,9 +1,6 @@
 import pandas as pd
-import openpyxl
 import ast
 from collections import defaultdict
-from itertools import combinations
-import Levenshtein
 import heapq
 import itertools
 from Levenshtein import distance as levenshtein_distance
@@ -39,8 +36,8 @@ def main():
     max_distance = -1
     most_different_pair = None
     different_dict = defaultdict(int)
-    for key_info, qa_list in itertools.islice(group_info.items(), 1):
-    #for key_info, qa_list in group_info.items():
+    #for key_info, qa_list in itertools.islice(group_info.items(), 1):
+    for key_info, qa_list in group_info.items():
         print('进入相似度比较')
         most_different_pair = find_most_different_objects(qa_list)
         # for (obj1, obj2) in combinations(qa_list, 2):
@@ -60,11 +57,9 @@ def main():
         print(count)
         result = count[0]
         print(result)
-        print(result[0][0]['query'])
         parts = key_info.split('&')
-        for i in range(8):
-            data_list.append([parts[0],parts[1],parts[2],parts[3],parts[4],result[i][0]['query'],result[i][0]['answer']])
-            data_list.append([parts[0], parts[1], parts[2], parts[3], parts[4], result[i][1]['query'], result[i][1]['answer']])
+        for i in range(len(result)):
+            data_list.append([parts[0],parts[1],parts[2],parts[3],parts[4],result[i]['query'],result[i]['answer']])
     df = pd.DataFrame(data_list, columns=['intent','indicator','duration', 'specialtyType','taskType','query','answer'])
     with pd.ExcelWriter(output_file, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
         df.to_excel(writer, index=False, header=True, sheet_name='Sheet1',
@@ -94,11 +89,23 @@ def find_most_different_objects(obj_list):
         elif distance > heap[0][0]:
             heapq.heappushpop(heap,heap_element)
 
-    heap.sort(reverse=True, key=lambda x: x[0])
-    print(heap)
+    # heap.sort(reverse=True, key=lambda x: x[0])
 
-    print('计算结束')
-    return [(obj1, obj2) for _, _, _, obj1, obj2 in heap]
+    result = []
+    for _, _, _, obj1, obj2 in heap:
+        result.append(obj1)
+        result.append(obj2)
+    #进行去重
+    seen_queries = {}
+    for obj in result:
+        query = obj['query']
+        if query not in seen_queries:
+            seen_queries[query] = obj
+    unique_objs = list(seen_queries.values())
+    print('去重结果:', unique_objs)
+    return unique_objs
+
+    #return [(obj1, obj2) for _, _, _, obj1, obj2 in heap]
         # if distance > max_distance:
         #     max_distance = distance
         #     most_different_pair = [obj1, obj2]
