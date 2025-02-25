@@ -1,0 +1,40 @@
+杰出精英奖项名单？ Y
+select DISTINCT award_name as '奖项名称' FROM cco_ispc_award_info WHERE type = '评优获奖' and (award_name LIKE '%杰出%' OR award_name LIKE '%精英%') and yn=1 LIMIT 100
+
+都中的什么奖？  N   中奖未识别 去重
+select DISTINCT award_name as '奖项名称' FROM cco_ispc_award_info WHERE yn=1 LIMIT 100
+
+杰出项目奖的中奖  group_name  N
+select user_name as '获奖人' from cco_ispc_award_info where type = '评优获奖' and award_name='杰出项目奖' and yn=1
+
+
+杰出项目奖获奖名单  Y
+select group_name as '团体名称' FROM cco_ispc_award_info WHERE type = '评优获奖' and award_name='杰出项目奖' and yn=1 GROUP BY group_name
+
+
+杰出项目奖的中奖/获奖名单  Y
+select group_name as '团体名称' FROM cco_ispc_award_info WHERE type = '评优获奖' and award_name='杰出项目奖' and yn=1 GROUP BY group_name
+
+体系有多少个人奖？有多少项目获奖？
+SELECT COUNT(DISTINCT user_name) AS '个人奖获奖人数', COUNT(DISTINCT award_project_name) AS '项目获奖数量' FROM cco_ispc_award_info
+WHERE type = '评优获奖' AND (award_name = '非凡个人奖' OR award_name = '价值观典范奖' OR award_name = '杰出项目奖') AND yn = 1
+
+SELECT COUNT(DISTINCT user_name) AS '个人奖获奖人数' where （award_name = '非凡个人奖' OR award_name = '价值观典范奖'）
+union all
+select
+
+
+和我一起中奖的有哪些人
+select user_name as '中奖人' from cco_ispc_award_info where type = '抽奖中奖' and full_department_name like
+'%信息安全部-合规技术组%' and yn=1
+
+
+这次一共有多少个奖项名额
+select count(DISTINCT award_name) as '奖项名额总数' FROM cco_ispc_award_info WHERE type = '评优获奖' and yn=1
+
+
+每个奖项有多少个
+select award_name as '奖项名称', count(*) as '数量' FROM cco_ispc_award_info WHERE yn=1 GROUP BY award_name LIMIT 100
+
+非凡个人奖项有多少个
+select count(*) as '非凡个人奖项数量' from cco_ispc_award_info where type = '评优获奖' and award_name='非凡个人奖' and yn=1
